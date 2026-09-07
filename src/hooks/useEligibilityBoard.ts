@@ -25,7 +25,6 @@ export interface UseEligibilityBoardReturn {
   addActivityToken: (participantIndex: number, token: string) => void;
   removeActivityToken: (participantIndex: number, tokenIndex: number) => void;
   setParticipantTokens: (participantIndex: number, tokens: string[]) => void;
-  loadPreset: (preset: 'builtin' | 'c05_plus_a04' | 'c01_empty' | 'c01_duplicate_a01') => void;
 }
 
 export function useEligibilityBoard(): UseEligibilityBoardReturn {
@@ -98,40 +97,6 @@ export function useEligibilityBoard(): UseEligibilityBoardReturn {
     setHasEvaluated(false);
   }, []);
 
-  const loadPreset = useCallback(
-    (preset: 'builtin' | 'c05_plus_a04' | 'c01_empty' | 'c01_duplicate_a01') => {
-      let presetParticipants: Participant[] = getDefaultParticipants();
-
-      switch (preset) {
-        case 'builtin':
-          presetParticipants = getDefaultParticipants();
-          break;
-        case 'c05_plus_a04':
-          presetParticipants = presetParticipants.map((p) =>
-            p.id === 'C05' ? { ...p, activityIds: ['A01', 'A03', 'A04'] } : p
-          );
-          break;
-        case 'c01_empty':
-          presetParticipants = presetParticipants.map((p) =>
-            p.id === 'C01' ? { ...p, activityIds: [] } : p
-          );
-          break;
-        case 'c01_duplicate_a01':
-          presetParticipants = presetParticipants.map((p) =>
-            p.id === 'C01'
-              ? { ...p, activityIds: ['A01', 'A02', 'A03', 'A01'] }
-              : p
-          );
-          break;
-      }
-
-      setParticipants(presetParticipants);
-      setEvaluationResult(null);
-      setHasEvaluated(false);
-    },
-    []
-  );
-
   return {
     participants,
     activities: FIXED_ACTIVITIES,
@@ -145,6 +110,5 @@ export function useEligibilityBoard(): UseEligibilityBoardReturn {
     addActivityToken,
     removeActivityToken,
     setParticipantTokens: setTokens,
-    loadPreset,
   };
 }

@@ -1,6 +1,5 @@
 import { FIXED_ACTIVITIES } from './constants';
 import { evaluateParticipantActivities } from './evaluator';
-import { normalizeParticipantId } from './normalizer';
 import type { Activity, Participant, ParticipantEvaluation, TableEvaluationResult } from './types';
 import { validateParticipants } from './validator';
 
@@ -44,24 +43,15 @@ export function evaluateBoard(
     };
   });
 
-  // Sort: Eligible first, then Ineligible; within each group, sort by numeric ID ascending
+  // Sort: Eligible first, then Ineligible; within each group, sort by participant ID ascending
   evaluations.sort((a, b) => {
     // 1. Eligible first (true < false in sorting)
     if (a.isEligible !== b.isEligible) {
       return a.isEligible ? -1 : 1;
     }
 
-    // 2. Sort by participant numeric ID / canonical form ascending
-    const normA = normalizeParticipantId(a.participantId);
-    const normB = normalizeParticipantId(b.participantId);
-
-    if (normA.numericValue !== null && normB.numericValue !== null) {
-      if (normA.numericValue !== normB.numericValue) {
-        return normA.numericValue - normB.numericValue;
-      }
-    }
-
-    return a.participantId.localeCompare(b.participantId);
+    // 2. Sort by participant ID ascending (natural sort e.g. C01, C02 or C1, C2)
+    return a.participantId.localeCompare(b.participantId, undefined, { numeric: true });
   });
 
   const eligibleCount = evaluations.filter((e) => e.isEligible).length;

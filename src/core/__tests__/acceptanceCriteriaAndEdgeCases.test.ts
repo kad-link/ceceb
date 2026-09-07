@@ -220,15 +220,27 @@ describe('SI26_P12: Comprehensive Acceptance Criteria & Edge Cases Suite', () =>
       expect(result.evaluations[0].isEligible).toBe(true);
     });
 
-    it('treats participant IDs as equivalent regardless of case and leading zeros (C05, c05, C5, c5)', () => {
-      const roster: Participant[] = [
+    it('checks participant ID uniqueness strictly by exact trimmed string comparison (no case-folding or leading-zero equivalence)', () => {
+      // 1. Exact duplicates after trimming are flagged
+      const dupRoster: Participant[] = [
+        { id: 'C05', name: 'Alice', activityIds: ['A01'] },
+        { id: '  C05  ', name: 'Bob', activityIds: ['A02'] },
+      ];
+      const dupErrors = validateParticipants(dupRoster).filter(
+        (e) => e.errorType === 'DUPLICATE_PARTICIPANT_ID'
+      );
+      expect(dupErrors.length).toBe(2);
+      expect(dupErrors[0].errorType).toBe('DUPLICATE_PARTICIPANT_ID');
+
+      // 2. Different case or leading zeros (C05 vs c5 or C5) are distinct valid IDs under the contract
+      const distinctRoster: Participant[] = [
         { id: 'C05', name: 'Alice', activityIds: ['A01'] },
         { id: 'c5', name: 'Bob', activityIds: ['A02'] },
       ];
-      const errors = validateParticipants(roster);
-      const dupErrors = errors.filter((e) => e.errorType === 'DUPLICATE_PARTICIPATION' || e.errorType === 'DUPLICATE_PARTICIPANT_ID');
-      expect(dupErrors.length).toBe(2);
-      expect(dupErrors[0].errorType).toBe('DUPLICATE_PARTICIPANT_ID');
+      const distinctErrors = validateParticipants(distinctRoster).filter(
+        (e) => e.errorType === 'DUPLICATE_PARTICIPANT_ID'
+      );
+      expect(distinctErrors.length).toBe(0);
     });
 
     it('treats activity IDs as equivalent regardless of case and leading zeros (A01, a01, A1, a1)', () => {
@@ -241,15 +253,22 @@ describe('SI26_P12: Comprehensive Acceptance Criteria & Edge Cases Suite', () =>
       expect(errors[0].errorType).toBe('DUPLICATE_PARTICIPATION');
     });
 
-    it('flags participant ID not following C<number> format as INVALID_PARTICIPANT', () => {
+    it('accepts any non-empty trimmed string as a valid participant ID without requiring C<number> shape', () => {
       const roster: Participant[] = [
         { id: 'P01', name: 'Asha', activityIds: ['A01'] },
         { id: '123', name: 'Bilal', activityIds: ['A02'] },
+        { id: 'user-xyz', name: 'Chen', activityIds: ['A03'] },
       ];
       const errors = validateParticipants(roster);
-      expect(errors).toHaveLength(2);
-      expect(errors[0].errorType).toBe('INVALID_PARTICIPANT');
-      expect(errors[1].errorType).toBe('INVALID_PARTICIPANT');
+      expect(errors).toHaveLength(0);
+
+      // Verify empty or whitespace-only ID IS flagged as INVALID_PARTICIPANT
+      const invalidRoster: Participant[] = [
+        { id: '   ', name: 'Dave', activityIds: ['A01'] },
+      ];
+      const invalidErrors = validateParticipants(invalidRoster);
+      expect(invalidErrors).toHaveLength(1);
+      expect(invalidErrors[0].errorType).toBe('INVALID_PARTICIPANT');
     });
 
     it('flags blank participant name as INVALID_PARTICIPANT with exact format "{participant_id} has no valid name"', () => {

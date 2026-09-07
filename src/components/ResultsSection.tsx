@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, CheckCircle2, RotateCcw, UserCheck, UserX, Users } from 'lucide-react';
+import { Award, CheckCircle2, UserCheck, UserX, Users } from 'lucide-react';
 import { MIN_POINTS_FOR_ELIGIBILITY, REQUIRED_CATEGORIES } from '../core/constants';
 import type { ParticipantEvaluation } from '../core/types';
 import { CategoryProgressStrip } from './CategoryProgressStrip';
@@ -11,13 +11,11 @@ interface ResultsSectionProps {
     eligible: number;
     ineligible: number;
   };
-  onReset?: () => void;
 }
 
 export const ResultsSection: React.FC<ResultsSectionProps> = ({
   evaluations,
   summaryCounts,
-  onReset,
 }) => {
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -103,17 +101,6 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
               Ordered: Eligible participants first, then Ineligible (sorted by Participant ID ascending).
             </p>
           </div>
-
-          {onReset && (
-            <button
-              type="button"
-              onClick={onReset}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-slate-900 shadow-2xs cursor-pointer transition-all active:scale-98"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Board</span>
-            </button>
-          )}
         </div>
 
         {/* Results Table */}

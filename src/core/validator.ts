@@ -1,5 +1,5 @@
 import { FIXED_ACTIVITIES } from './constants';
-import { normalizeActivityId, normalizeParticipantId } from './normalizer';
+import { normalizeActivityId } from './normalizer';
 import type { Activity, Participant, ValidationError, ValidationErrorCode } from './types';
 
 /**
@@ -14,8 +14,8 @@ import type { Activity, Participant, ValidationError, ValidationErrorCode } from
  *    - INVALID_PARTICIPANT
  *    - UNKNOWN_ACTIVITY
  * 4. Checks:
- *    - INVALID_PARTICIPANT: Invalid ID format (must be C<number>) or blank name.
- *    - DUPLICATE_PARTICIPANT_ID: Multiple participants share the same canonical ID.
+ *    - INVALID_PARTICIPANT: Missing/empty ID or blank name.
+ *    - DUPLICATE_PARTICIPANT_ID: Multiple participants share the exact same trimmed ID.
  *    - UNKNOWN_ACTIVITY: Activity ID not matching A<number> or not in catalog.
  *    - DUPLICATE_PARTICIPATION: Participant lists the same activity more than once.
  */
@@ -30,14 +30,14 @@ export function validateParticipants(
     catalog.map((a) => a.canonicalId)
   );
 
-  // First pass: identify duplicates among valid canonical participant IDs
-  const participantCountByCanonical = new Map<string, number>();
+  // First pass: identify duplicates among exact trimmed participant IDs
+  const participantCountByTrimmed = new Map<string, number>();
   for (const p of participants) {
-    const norm = normalizeParticipantId(p.id);
-    if (norm.isValidFormat && norm.canonicalId) {
-      participantCountByCanonical.set(
-        norm.canonicalId,
-        (participantCountByCanonical.get(norm.canonicalId) ?? 0) + 1
+    const trimmedId = (p.id ?? '').trim();
+    if (trimmedId) {
+      participantCountByTrimmed.set(
+        trimmedId,
+        (participantCountByTrimmed.get(trimmedId) ?? 0) + 1
       );
     }
   }
@@ -45,19 +45,16 @@ export function validateParticipants(
   // Second pass: validate each participant record
   participants.forEach((p, index) => {
     const participantErrors: ValidationError[] = [];
-    const normP = normalizeParticipantId(p.id);
-    const displayParticipantId = normP.trimmed || `Row ${index + 1}`;
+    const trimmedId = (p.id ?? '').trim();
+    const displayParticipantId = trimmedId || `Row ${index + 1}`;
 
-    // 1. Participant ID format check
-    if (!normP.isValidFormat) {
-      const desc = normP.trimmed
-        ? `Participant ID "${normP.trimmed}" must follow C<number> format`
-        : `Participant ID is missing or empty`;
+    // 1. Participant ID check: must be non-empty and unique
+    if (!trimmedId) {
       participantErrors.push(
-        createError('INVALID_PARTICIPANT', displayParticipantId, undefined, desc)
+        createError('INVALID_PARTICIPANT', displayParticipantId, undefined, 'Participant ID is missing or empty')
       );
-    } else if (normP.canonicalId && (participantCountByCanonical.get(normP.canonicalId) ?? 0) > 1) {
-      // DUPLICATE_PARTICIPANT_ID
+    } else if ((participantCountByTrimmed.get(trimmedId) ?? 0) > 1) {
+      // DUPLICATE_PARTICIPANT_ID: fires only on exact trimmed ID match
       participantErrors.push(
         createError(
           'DUPLICATE_PARTICIPANT_ID',

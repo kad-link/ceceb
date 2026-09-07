@@ -1,17 +1,15 @@
 import React from 'react';
-import { AlertOctagon, RotateCcw } from 'lucide-react';
+import { AlertOctagon } from 'lucide-react';
 import type { ValidationError } from '../core/types';
 
 interface ValidationErrorsPanelProps {
   errors: readonly ValidationError[];
-  onReset?: () => void;
 }
 
-export const ValidationErrorsPanel: React.FC<ValidationErrorsPanelProps> = ({ errors, onReset }) => {
+export const ValidationErrorsPanel: React.FC<ValidationErrorsPanelProps> = ({ errors }) => {
   if (errors.length === 0) return null;
 
   return (
-    
     <div className="bg-rose-50/90 border border-rose-200 rounded-xl p-4 text-slate-900 shadow-sm animate-in fade-in slide-in-from-top-1 duration-200">
       <div className="flex items-start gap-3">
         <div className="p-2 bg-rose-100 text-rose-700 rounded-lg shrink-0">
@@ -31,16 +29,6 @@ export const ValidationErrorsPanel: React.FC<ValidationErrorsPanelProps> = ({ er
               <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-200/80 text-rose-800">
                 0 Results Evaluated
               </span>
-              {onReset && (
-                <button
-                  type="button"
-                  onClick={onReset}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-800 bg-white border border-rose-300 rounded hover:bg-rose-100 cursor-pointer shadow-2xs transition-all active:scale-98"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Reset to Defaults</span>
-                </button>
-              )}
             </div>
           </div>
 
@@ -68,10 +56,6 @@ export const ValidationErrorsPanel: React.FC<ValidationErrorsPanelProps> = ({ er
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="mt-3 pt-2.5 border-t border-rose-200/60 text-[11px] text-rose-600 font-mono whitespace-pre-wrap">
-            {errors.map((err) => err.formattedMessage).join('\n')}
           </div>
         </div>
       </div>

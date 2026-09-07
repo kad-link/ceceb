@@ -12,7 +12,6 @@ interface ParticipantTableProps {
   onRemoveToken: (participantIndex: number, tokenIndex: number) => void;
   onEvaluate: () => void;
   onReset: () => void;
-  onLoadPreset: (preset: 'builtin' | 'c05_plus_a04' | 'c01_empty' | 'c01_duplicate_a01') => void;
 }
 
 export const ParticipantTable: React.FC<ParticipantTableProps> = ({
@@ -25,7 +24,6 @@ export const ParticipantTable: React.FC<ParticipantTableProps> = ({
   onRemoveToken,
   onEvaluate,
   onReset,
-  onLoadPreset,
 }) => {
   // Local input state for token entry per participant row
   const [tokenInputs, setTokenInputs] = useState<Record<number, string>>({});
@@ -60,53 +58,14 @@ export const ParticipantTable: React.FC<ParticipantTableProps> = ({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-      {/* Header & Quick Presets */}
-      <div className="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-slate-900 tracking-tight">
-            Editable Participant Roster
-          </h2>
-          <p className="text-xs text-slate-500">
-            Edit IDs, names, and activities as interactive tokens.
-          </p>
-        </div>
-
-        {/* Quick Test Preset Buttons */}
-        <div className="flex items-center flex-wrap gap-1.5 text-xs">
-          <span className="text-[11px] font-medium text-slate-400 mr-1">Presets:</span>
-          <button
-            type="button"
-            onClick={() => onLoadPreset('builtin')}
-            className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors cursor-pointer text-xs"
-            title="Load default C01-C05 built-in records"
-          >
-            Built-in (Oracle)
-          </button>
-          <button
-            type="button"
-            onClick={() => onLoadPreset('c05_plus_a04')}
-            className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors cursor-pointer text-xs"
-            title="Test 3: Add A04 to C05 (3 eligible, 2 ineligible)"
-          >
-            C05 + A04
-          </button>
-          <button
-            type="button"
-            onClick={() => onLoadPreset('c01_empty')}
-            className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors cursor-pointer text-xs"
-            title="Test 4: Clear C01 activities (1 eligible, 4 ineligible)"
-          >
-            Clear C01
-          </button>
-          <button
-            type="button"
-            onClick={() => onLoadPreset('c01_duplicate_a01')}
-            className="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-medium transition-colors cursor-pointer text-xs"
-            title="Test 5: Add duplicate A01 to C01 (blocks evaluation)"
-          >
-            Duplicate A01
-          </button>
-        </div>
+      {/* Header */}
+      <div className="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200">
+        <h2 className="text-sm font-semibold text-slate-900 tracking-tight">
+          Editable Participant Roster
+        </h2>
+        <p className="text-xs text-slate-500">
+          Edit IDs, names, and activities as interactive tokens.
+        </p>
       </div>
 
       {/* Participants Table */}

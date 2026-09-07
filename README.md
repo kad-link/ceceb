@@ -186,9 +186,9 @@ export const FIXED_ACTIVITIES: readonly Activity[] = [
 * **Requirement**: A single validation error must block the entire evaluation; no partial results for valid rows if other rows are broken.
 * **Implementation**: In `boardEvaluator.ts`, if `errors.length > 0`, the function immediately returns `evaluations: []` and zeroed summary counts (`total: 0, eligible: 0, ineligible: 0`).
 
-### Decision 8: Reset Action
+### Decision 8: Reset Action (Single Dedicated Button)
 * **Requirement**: Restore sample participants (C01–C05) and clear validation, results, and counts until Evaluate is clicked again.
-* **Implementation**: `reset()` restores a deep clone of `BUILT_IN_PARTICIPANTS` and resets `evaluationResult` to `null` and `hasEvaluated` to `false`.
+* **Implementation**: The application features a single **"Reset to Defaults"** button located exclusively in the **Editable Participant Roster** toolbar (beside the "Evaluate Participation" button). Invoking `reset()` restores a deep clone of `BUILT_IN_PARTICIPANTS` and resets `evaluationResult` to `null` and `hasEvaluated` to `false`.
 
 ---
 

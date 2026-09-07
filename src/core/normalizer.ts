@@ -2,9 +2,10 @@
  * Normalization utilities for Participant IDs and Activity IDs.
  *
  * Rules:
- * - Leading and trailing whitespace must be trimmed.
- * - Participant IDs must strictly follow C<number> (e.g., C01, c01, C1, c1 -> canonical "C1").
- * - Activity IDs must strictly follow A<number> (e.g., A01, a01, A1, a1 -> canonical "A1").
+ * - Participant IDs: Trim leading and trailing whitespace. Must be non-empty.
+ *   No required format, no case-folding, no leading-zero equivalence.
+ * - Activity IDs: Must strictly follow A<number> (e.g., A01, a01, A1, a1 -> canonical "A1")
+ *   and match against the fixed A01–A04 catalog.
  */
 
 export interface NormalizedIdResult {
@@ -17,25 +18,14 @@ export interface NormalizedIdResult {
 
 export function normalizeParticipantId(rawId: string): NormalizedIdResult {
   const trimmed = (rawId ?? '').trim();
-  const match = trimmed.match(/^[Cc](\d+)$/);
+  const isValidFormat = trimmed.length > 0;
 
-  if (!match) {
-    return {
-      raw: rawId,
-      trimmed,
-      isValidFormat: false,
-      canonicalId: null,
-      numericValue: null,
-    };
-  }
-
-  const numericValue = parseInt(match[1], 10);
   return {
     raw: rawId,
     trimmed,
-    isValidFormat: true,
-    canonicalId: `C${numericValue}`,
-    numericValue,
+    isValidFormat,
+    canonicalId: isValidFormat ? trimmed : null,
+    numericValue: null,
   };
 }
 

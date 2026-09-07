@@ -73,11 +73,10 @@ describe('Step 2: Participant Roster State & Validation Layer', () => {
       expect(errors[0].errorType).toBe('INVALID_PARTICIPANT');
     });
 
-    it('flags invalid participant ID format (e.g. non C<number>) as INVALID_PARTICIPANT', () => {
+    it('accepts any non-empty participant ID string format without requiring C<number> shape', () => {
       const roster: Participant[] = [{ id: 'X99', name: 'Asha', activityIds: ['A01'] }];
       const errors = validateParticipants(roster);
-      expect(errors[0].errorType).toBe('INVALID_PARTICIPANT');
-      expect(errors[0].description).toContain('must follow C<number> format');
+      expect(errors).toHaveLength(0);
     });
 
     it('flags empty participant name as INVALID_PARTICIPANT with exact format', () => {
@@ -87,10 +86,10 @@ describe('Step 2: Participant Roster State & Validation Layer', () => {
       expect(errors[0].description).toBe('C01 has no valid name');
     });
 
-    it('flags duplicate participant IDs across the table', () => {
+    it('flags duplicate participant IDs across the table when trimmed IDs match exactly', () => {
       const roster: Participant[] = [
         { id: 'C01', name: 'Asha', activityIds: ['A01'] },
-        { id: 'c01', name: 'Another Asha', activityIds: ['A02'] },
+        { id: '  C01  ', name: 'Another Asha', activityIds: ['A02'] },
       ];
       const errors = validateParticipants(roster);
       const dupErrors = errors.filter((e) => e.errorType === 'DUPLICATE_PARTICIPANT_ID');

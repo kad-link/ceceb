@@ -1,5 +1,4 @@
 import { BUILT_IN_PARTICIPANTS } from './constants';
-import { normalizeParticipantId } from './normalizer';
 import type { Participant } from './types';
 
 /**
@@ -19,9 +18,12 @@ export function getDefaultParticipants(): Participant[] {
 export function getNextParticipantId(participants: readonly Participant[]): string {
   let maxNum = 0;
   for (const p of participants) {
-    const norm = normalizeParticipantId(p.id);
-    if (norm.numericValue !== null && norm.numericValue > maxNum) {
-      maxNum = norm.numericValue;
+    const match = (p.id ?? '').trim().match(/\d+/);
+    if (match) {
+      const num = parseInt(match[0], 10);
+      if (num > maxNum) {
+        maxNum = num;
+      }
     }
   }
   const nextNum = maxNum + 1;

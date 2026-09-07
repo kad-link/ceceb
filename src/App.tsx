@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, CheckCircle, Info, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Award, CheckCircle, Info, ShieldCheck } from 'lucide-react';
 import { MIN_POINTS_FOR_ELIGIBILITY, REQUIRED_CATEGORIES } from './core/constants';
 import { ActivityCatalog } from './components/ActivityCatalog';
 import { ParticipantTable } from './components/ParticipantTable';
@@ -20,7 +20,6 @@ export const App: React.FC = () => {
     removeParticipant,
     addActivityToken,
     removeActivityToken,
-    loadPreset,
   } = useEligibilityBoard();
 
   return (
@@ -47,7 +46,7 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Status Indicator & Global Reset */}
+          {/* Status Indicator */}
           <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border bg-slate-50 border-slate-200 text-slate-600">
               <ShieldCheck className="w-4 h-4 text-slate-500" />
@@ -62,16 +61,6 @@ export const App: React.FC = () => {
                 )}
               </span>
             </div>
-
-            <button
-              type="button"
-              onClick={reset}
-              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-slate-900 shadow-2xs cursor-pointer transition-all active:scale-98"
-              title="Restore sample participants and clear results/errors"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-              <span>Reset</span>
-            </button>
           </div>
         </div>
       </header>
@@ -125,14 +114,13 @@ export const App: React.FC = () => {
               onRemoveToken={removeActivityToken}
               onEvaluate={evaluate}
               onReset={reset}
-              onLoadPreset={loadPreset}
             />
           </div>
         </div>
 
         {/* Validation Errors Display (When any validation error exists) */}
         {hasEvaluated && evaluationResult && !evaluationResult.isValid && (
-          <ValidationErrorsPanel errors={evaluationResult.errors} onReset={reset} />
+          <ValidationErrorsPanel errors={evaluationResult.errors} />
         )}
 
         {/* Evaluation Results Display (When evaluation is valid) */}
@@ -140,7 +128,6 @@ export const App: React.FC = () => {
           <ResultsSection
             evaluations={evaluationResult.evaluations}
             summaryCounts={evaluationResult.summaryCounts}
-            onReset={reset}
           />
         )}
 

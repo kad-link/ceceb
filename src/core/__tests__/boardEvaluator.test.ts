@@ -169,10 +169,10 @@ describe('Board Evaluator and Validator Full Flow', () => {
       );
     });
 
-    it('detects DUPLICATE_PARTICIPANT_ID when IDs match canonically (e.g., C05 and c5)', () => {
+    it('detects DUPLICATE_PARTICIPANT_ID when IDs match exactly after trimming whitespace', () => {
       const participants: Participant[] = [
         { id: 'C05', name: 'Alice', activityIds: ['A01'] },
-        { id: 'c5', name: 'Bob', activityIds: ['A02'] },
+        { id: '  C05  ', name: 'Bob', activityIds: ['A02'] },
       ];
       const errors = validateParticipants(participants);
       const dupErrors = errors.filter((e) => e.errorType === 'DUPLICATE_PARTICIPANT_ID');
